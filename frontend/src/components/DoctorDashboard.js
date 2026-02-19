@@ -229,7 +229,7 @@ function DoctorDashboard({ user, onLogout }) {
   return (
     <div className="dashboard doctor-dashboard">
       <div className="dashboard-header">
-        <h1>Dr. {user.name}'s Dashboard</h1>
+        <h1>{user.name}'s Dashboard</h1>
         <div className="stats-summary">
           <span className="stat">Waiting: {patients.waiting.length}</span>
           <span className="stat">With Doctor: {patients.with_doctor.length}</span>
