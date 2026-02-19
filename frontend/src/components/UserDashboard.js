@@ -200,6 +200,11 @@ function UserDashboard({ user, onLogout }) {
     return <span className={`badge ${statusClasses[status] || 'badge-secondary'}`}>{status}</span>;
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleString();
+  };
+
   return (
     <div className="dashboard user-dashboard">
       {showNotification && notifications.filter(n => !n.is_read).length > 0 && (
@@ -316,40 +321,54 @@ function UserDashboard({ user, onLogout }) {
         {activeTab === 'tokens' && (
           <div className="tokens-panel">
             <h3>My Tokens</h3>
-            <div className="tokens-list">
-              {myTokens.length > 0 ? (
-                myTokens.map(token => (
-                  <div key={token.token_id} className="token-card">
-                    <div className="token-header">
-                      <span className="token-number">#{token.token_number}</span>
-                      {getStatusBadge(token.status)}
-                    </div>
-                    <div className="token-details">
-                      <p><strong>Created:</strong> {token.created_at}</p>
-                      {token.called_at && <p><strong>Called:</strong> {token.called_at}</p>}
-                      {token.completed_at && <p><strong>Completed:</strong> {token.completed_at}</p>}
-                      {token.doctor_name && <p><strong>Doctor:</strong> {token.doctor_name}</p>}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="no-data">No tokens found. Click "Get New Token" to generate one.</p>
-              )}
-            </div>
+            {myTokens.length > 0 ? (
+              <div className="table-responsive">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Token #</th>
+                      <th>Status</th>
+                      <th>Created At</th>
+                      <th>Called At</th>
+                      <th>Completed At</th>
+                      <th>Doctor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myTokens.map(token => (
+                      <tr key={token.token_id}>
+                        <td>
+                          <span className="token-number-cell">#{token.token_number}</span>
+                        </td>
+                        <td>
+                          {getStatusBadge(token.status)}
+                        </td>
+                        <td>{formatDate(token.created_at)}</td>
+                        <td>{formatDate(token.called_at)}</td>
+                        <td>{formatDate(token.completed_at)}</td>
+                        <td>{token.doctor_name || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="no-data">No tokens found. Click "Get New Token" to generate one.</p>
+            )}
           </div>
         )}
 
         {activeTab === 'suggestions' && (
           <div className="suggestions-panel">
             <h3>Doctor's Suggestions</h3>
-            <div className="suggestions-list">
-              {mySuggestions.length > 0 ? (
-                mySuggestions.map(suggestion => (
+            {mySuggestions.length > 0 ? (
+              <div className="suggestions-table-container">
+                {mySuggestions.map(suggestion => (
                   <div key={suggestion.id} className="suggestion-card">
                     <div className="suggestion-header">
                       <h4>Token #{suggestion.token_number}</h4>
                       <span className="doctor-name">Dr. {suggestion.doctor_name}</span>
-                      <span className="suggestion-date">{suggestion.created_at}</span>
+                      <span className="suggestion-date">{formatDate(suggestion.created_at)}</span>
                     </div>
                     
                     <div className="suggestion-content">
@@ -358,11 +377,20 @@ function UserDashboard({ user, onLogout }) {
                       {suggestion.medicines && suggestion.medicines.length > 0 && (
                         <div className="medicines-section">
                           <h5>Prescribed Medicines:</h5>
-                          <ul>
-                            {suggestion.medicines.map((medicine, idx) => (
-                              <li key={idx}>{medicine}</li>
-                            ))}
-                          </ul>
+                          <table className="medicines-table">
+                            <thead>
+                              <tr>
+                                <th>Medicine Name</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {suggestion.medicines.map((medicine, idx) => (
+                                <tr key={idx}>
+                                  <td>{medicine}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       )}
                       
@@ -374,11 +402,11 @@ function UserDashboard({ user, onLogout }) {
                       )}
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className="no-data">No suggestions found</p>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="no-data">No suggestions found</p>
+            )}
           </div>
         )}
 
@@ -394,7 +422,7 @@ function UserDashboard({ user, onLogout }) {
                     onClick={() => markNotificationRead(notification.id)}
                   >
                     <div className="notification-message">{notification.message}</div>
-                    <div className="notification-time">{notification.created_at}</div>
+                    <div className="notification-time">{formatDate(notification.created_at)}</div>
                     {!notification.is_read && <span className="unread-dot">●</span>}
                   </div>
                 ))
